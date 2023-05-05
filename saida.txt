@@ -1,0 +1,1 @@
+Isso aqui não vai sair pelo stdout, vai sair pelo arquivo saída.txt
