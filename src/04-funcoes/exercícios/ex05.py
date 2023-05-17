@@ -1,3 +1,4 @@
+breakpoint()
 
 def calcular_imc(individuo):
     imc = individuo["peso"] / (individuo["altura"] ** 2)
