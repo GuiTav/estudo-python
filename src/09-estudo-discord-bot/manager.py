@@ -1,3 +1,4 @@
+import os
 from discord.ext import commands
 from discord.ext.commands.errors import CommandNotFound, MissingRequiredArgument
 
@@ -5,6 +6,19 @@ from discord.ext.commands.errors import CommandNotFound, MissingRequiredArgument
 class Manager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await self.bot.load_extension("tasks")
+
+        for file in os.listdir("./src/09-estudo-discord-bot/commands"):
+            if file.endswith(".py"):
+                await self.bot.load_extension(f"commands.{file[:-3]}")
+        
+
+        print(f"Pronto! Bot disponível como {self.bot.user}")
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
