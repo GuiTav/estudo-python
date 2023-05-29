@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 import discord
 
 
@@ -7,7 +7,7 @@ class Files(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-
+    
 
     @commands.command()
     async def sync(self, ctx):
@@ -15,33 +15,9 @@ class Files(commands.Cog):
         await ctx.send(f"{len(comandos_sincronizados)} slash commands sincronizados.")
 
 
-    @app_commands.command(name="cadastrar-aluno", description="Cadastra um aluno no arquivo alunos.txt")
-    async def insert_student(self, interaction, prontuario: str, nome: str, email: str):
-        try:
-            arquivo = open("./alunos.txt", "r+", encoding="utf8")
-            for linha in arquivo:
-                prontuario_arquivo = linha.split(",")[0]
-                if prontuario == prontuario_arquivo:
-                    await interaction.response.send_message("O aluno já está cadastrado")
-                    return
-        
-
-        except FileNotFoundError:
-            arquivo = open("./alunos.txt", "w", encoding="utf8")
-        
-
-        except Exception as e:
-            arquivo.close()
-            print(e)
-            await interaction.response.send_message("Um erro desconhecido ocorreu")
-            return
-        
-
-        linha_adicional = f"{prontuario},{nome},{email}\n"
-        arquivo.write(linha_adicional)
-        arquivo.close()
-        await interaction.response.send_message("Aluno cadastrado com sucesso!")
-    
+    @app_commands.command(name="modal-cadastro" ,description="Cadastra um aluno no arquivo alunos.txt")
+    async def modal_insert(self, interaction):
+        await interaction.response.send_modal(modal_aluno())
 
     
 
@@ -65,6 +41,38 @@ class Files(commands.Cog):
             print(e)
             await interaction.response.send_message("Algum erro inesperado ocorreu")
 
+
+
+class modal_aluno(ui.Modal, title="Informações do aluno"):
+    prontuario = ui.TextInput(label="Digite o prontuário do aluno")
+    nome = ui.TextInput(label="Digite o nome do aluno")
+    email = ui.TextInput(label="Digite o email do aluno")
+
+    async def on_submit(self, interaction):
+        try:
+            arquivo = open("./alunos.txt", "r+", encoding="utf8")
+            for linha in arquivo:
+                prontuario_arquivo = linha.split(",")[0]
+                if self.prontuario.value == prontuario_arquivo:
+                    await interaction.response.send_message("O aluno já está cadastrado")
+                    return
+        
+
+        except FileNotFoundError:
+            arquivo = open("./alunos.txt", "w", encoding="utf8")
+        
+
+        except Exception as e:
+            arquivo.close()
+            print(e)
+            await interaction.response.send_message("Um erro desconhecido ocorreu")
+            return
+        
+
+        linha_adicional = f"{self.prontuario.value},{self.nome.value},{self.email.value}\n"
+        arquivo.write(linha_adicional)
+        arquivo.close()
+        await interaction.response.send_message("Aluno cadastrado com sucesso!")
 
 
 
